@@ -31,6 +31,24 @@ class AuthenticatedSessionControllerTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_team_member_credentials_authenticate_member_account(): void
+    {
+        $teamMember = TeamMember::factory()->create();
+        $memberUser = $teamMember->user()->create([
+            'name' => $teamMember->name,
+            'email' => $teamMember->email,
+            'password' => 'secure-member-password',
+        ]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $teamMember->email,
+            'password' => 'secure-member-password',
+        ]);
+
+        $response->assertRedirect(route('dashboard.index'));
+        $this->assertAuthenticatedAs($memberUser);
+    }
+
     public function test_invalid_credentials_return_a_visible_error(): void
     {
         User::factory()->create([

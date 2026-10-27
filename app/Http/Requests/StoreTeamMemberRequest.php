@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class StoreTeamMemberRequest extends FormRequest
 {
@@ -25,8 +26,15 @@ class StoreTeamMemberRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'role' => ['required', 'string', 'max:120'],
-            'email' => ['nullable', 'email:rfc', 'max:180', 'unique:team_members,email'],
-            'avatar_url' => ['nullable', 'url:http,https', 'max:255'],
+            'email' => [
+                'required',
+                'email:rfc',
+                'max:180',
+                'unique:team_members,email',
+                'unique:users,email',
+            ],
+            'password' => ['required', 'confirmed', Password::min(12)],
+            'photo' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'skills' => ['nullable', 'string', 'max:500'],
             'is_active' => ['sometimes', 'boolean'],

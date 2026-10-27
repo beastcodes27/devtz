@@ -86,7 +86,7 @@
             <div class="about-grid">
                 <div class="reveal">
                     <p class="kicker">About us</p>
-                    <h2 id="about-title">We engineer software that outlives hype cycles.</h2>
+                    <h2 id="about-title">We build software that works well and lasts.</h2>
                 </div>
                 <div class="about-story reveal">
                     <p class="about-lead">Founded on the conviction that high-performing software stems from rigorous architectural design, disciplined clean code practices, and uncompromising focus on speed.</p>
@@ -225,8 +225,8 @@
                     @foreach ($teamMembers as $teamMember)
                         <article class="person-card reveal">
                             <div class="person-avatar">
-                                @if ($teamMember->avatar_url)
-                                    <img src="{{ $teamMember->avatar_url }}" alt="" loading="lazy" decoding="async">
+                                @if ($teamMember->photoUrl())
+                                    <img src="{{ $teamMember->photoUrl() }}" alt="" loading="lazy" decoding="async">
                                 @else
                                     <span>{{ str($teamMember->name)->substr(0, 2)->upper() }}</span>
                                 @endif

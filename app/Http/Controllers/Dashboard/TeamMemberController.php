@@ -8,6 +8,11 @@ use App\Http\Requests\UpdateTeamMemberRequest;
 use App\Models\TeamMember;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class TeamMemberController extends Controller
 {
@@ -38,7 +43,24 @@ class TeamMemberController extends Controller
      */
     public function store(StoreTeamMemberRequest $request): RedirectResponse
     {
-        TeamMember::create($this->teamMemberData($request));
+        $storedPhotoPath = null;
+
+        try {
+            DB::transaction(function () use ($request, &$storedPhotoPath): void {
+                $teamMember = TeamMember::create($this->teamMemberData($request));
+                $storedPhotoPath = $this->storePhoto($teamMember, $request->file('photo'));
+                $teamMember->update(['photo_path' => $storedPhotoPath]);
+                $teamMember->user()->create([
+                    'name' => $teamMember->name,
+                    'email' => $teamMember->email,
+                    'password' => $request->validated('password'),
+                ]);
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete(array_filter([$storedPhotoPath]));
+
+            throw $exception;
+        }
 
         return to_route('dashboard.team-members.index')
             ->with('success', 'Team member added successfully.');
@@ -57,7 +79,44 @@ class TeamMemberController extends Controller
      */
     public function update(UpdateTeamMemberRequest $request, TeamMember $teamMember): RedirectResponse
     {
-        $teamMember->update($this->teamMemberData($request));
+        $storedPhotoPath = null;
+        $previousPhotoPath = $teamMember->photo_path;
+
+        try {
+            DB::transaction(function () use ($request, $teamMember, &$storedPhotoPath): void {
+                $data = $this->teamMemberData($request);
+
+                if ($request->hasFile('photo')) {
+                    $storedPhotoPath = $this->storePhoto($teamMember, $request->file('photo'));
+                    $data['photo_path'] = $storedPhotoPath;
+                }
+
+                $teamMember->update($data);
+
+                $loginData = [
+                    'name' => $teamMember->name,
+                    'email' => $teamMember->email,
+                ];
+
+                if ($request->filled('password')) {
+                    $loginData['password'] = $request->validated('password');
+                }
+
+                if ($teamMember->user) {
+                    $teamMember->user->update($loginData);
+                } elseif (isset($loginData['password'])) {
+                    $teamMember->user()->create($loginData);
+                }
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete(array_filter([$storedPhotoPath]));
+
+            throw $exception;
+        }
+
+        if ($storedPhotoPath !== null) {
+            Storage::disk('public')->delete(array_filter([$previousPhotoPath]));
+        }
 
         return to_route('dashboard.team-members.index')
             ->with('success', 'Team member updated successfully.');
@@ -68,7 +127,9 @@ class TeamMemberController extends Controller
      */
     public function destroy(TeamMember $teamMember): RedirectResponse
     {
+        $photoPath = $teamMember->photo_path;
         $teamMember->delete();
+        Storage::disk('public')->delete(array_filter([$photoPath]));
 
         return to_route('dashboard.team-members.index')
             ->with('success', 'Team member removed.');
@@ -78,7 +139,7 @@ class TeamMemberController extends Controller
     private function teamMemberData(
         StoreTeamMemberRequest|UpdateTeamMemberRequest $request,
     ): array {
-        $data = $request->validated();
+        $data = $request->safe()->except(['password', 'password_confirmation', 'photo']);
         $data['is_active'] = $request->boolean('is_active');
         $data['skills'] = collect(explode(',', $data['skills'] ?? ''))
             ->map(fn (string $skill): string => trim($skill))
@@ -88,5 +149,20 @@ class TeamMemberController extends Controller
             ->all();
 
         return $data;
+    }
+
+    private function storePhoto(TeamMember $teamMember, ?UploadedFile $photo): string
+    {
+        if ($photo === null) {
+            throw new RuntimeException('The team member photo could not be stored.');
+        }
+
+        $path = $photo->store('team-members/'.$teamMember->getKey(), 'public');
+
+        if (! is_string($path)) {
+            throw new RuntimeException('The team member photo could not be stored.');
+        }
+
+        return $path;
     }
 }

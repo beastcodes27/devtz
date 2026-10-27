@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\TeamMember;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateTeamMemberRequest extends FormRequest
 {
@@ -23,16 +25,21 @@ class UpdateTeamMemberRequest extends FormRequest
      */
     public function rules(): array
     {
+        $teamMember = $this->route('team_member');
+        $teamMember = $teamMember instanceof TeamMember ? $teamMember : null;
+
         return [
             'name' => ['required', 'string', 'max:120'],
             'role' => ['required', 'string', 'max:120'],
             'email' => [
-                'nullable',
+                'required',
                 'email:rfc',
                 'max:180',
-                Rule::unique('team_members', 'email')->ignore($this->route('team_member')),
+                Rule::unique('team_members', 'email')->ignore($teamMember),
+                Rule::unique('users', 'email')->ignore($teamMember?->user),
             ],
-            'avatar_url' => ['nullable', 'url:http,https', 'max:255'],
+            'password' => ['nullable', 'confirmed', Password::min(12)],
+            'photo' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'skills' => ['nullable', 'string', 'max:500'],
             'is_active' => ['sometimes', 'boolean'],

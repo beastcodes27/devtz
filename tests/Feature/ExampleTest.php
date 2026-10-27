@@ -17,6 +17,7 @@ class ExampleTest extends TestCase
             ->assertSee('content="width=device-width, initial-scale=1"', false)
             ->assertSee('We make')
             ->assertSee('About us')
+            ->assertSee('We build software that works well and lasts.')
             ->assertSee('Services')
             ->assertSee('Our work')
             ->assertSee('Our team')

@@ -2,10 +2,10 @@
 
 @section('title', 'Add team member')
 @section('heading', 'Add team member')
-@section('subheading', 'Create a public-ready team profile and make it available for project assignments.')
+@section('subheading', 'Add a public profile, member photo, and dashboard sign-in credentials.')
 
 @section('content')
-    <form method="POST" action="{{ route('dashboard.team-members.store') }}">
+    <form method="POST" action="{{ route('dashboard.team-members.store') }}" enctype="multipart/form-data">
         @csrf
         @include('dashboard.team-members._form', ['submitLabel' => 'Add team member'])
     </form>

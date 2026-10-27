@@ -36,10 +36,12 @@ class PortfolioContentTest extends TestCase
             'status' => ProjectStatus::Draft,
             'is_featured' => true,
         ]);
-        TeamMember::factory()->create([
+        $visibleTeamMember = TeamMember::factory()->create([
             'name' => 'Visible teammate',
+            'photo_path' => 'team-members/visible/photo.jpg',
             'is_active' => true,
         ]);
+        Storage::disk('public')->put($visibleTeamMember->photo_path, 'photo');
         TeamMember::factory()->create([
             'name' => 'Hidden teammate',
             'is_active' => false,
@@ -54,6 +56,7 @@ class PortfolioContentTest extends TestCase
             ->assertDontSee('Private project')
             ->assertDontSee('Draft project')
             ->assertSee('Visible teammate')
+            ->assertSee(Storage::disk('public')->url($visibleTeamMember->photo_path), false)
             ->assertDontSee('Hidden teammate');
         $this->assertSame(3, substr_count($response->getContent(), 'data-gallery-slide'));
     }

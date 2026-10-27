@@ -30,7 +30,7 @@
                 <a class="mb-12 flex items-center gap-3 lg:hidden" href="{{ route('portfolio') }}"><span class="grid size-10 place-items-center rounded-xl bg-ink text-[11px] font-black tracking-[-0.08em] text-white">D/TZ</span><strong>DevTZ Studio</strong></a>
                 <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand">Welcome back</p>
                 <h2 class="mt-3 text-4xl font-black tracking-[-0.05em]">Sign in to your dashboard</h2>
-                <p class="mt-3 text-sm leading-6 text-slate-500">Use the administrator account created on your server.</p>
+                <p class="mt-3 text-sm leading-6 text-slate-500">Use your administrator or team member account.</p>
 
                 <form class="mt-9 flex flex-col gap-5" method="POST" action="{{ route('login.store') }}">
                     @csrf

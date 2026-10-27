@@ -22,6 +22,7 @@ class TeamMemberFactory extends Factory
             'role' => fake()->randomElement(['Designer', 'Developer', 'Project lead', 'Strategist']),
             'email' => fake()->unique()->safeEmail(),
             'avatar_url' => null,
+            'photo_path' => null,
             'bio' => fake()->sentence(18),
             'skills' => fake()->randomElements(['Laravel', 'UI design', 'Strategy', 'JavaScript', 'APIs'], 3),
             'is_active' => true,
