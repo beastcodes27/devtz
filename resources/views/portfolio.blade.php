@@ -186,20 +186,44 @@
                 <p>You work directly with the people doing the work. That means quicker answers, fewer surprises, and a result that stays true to your goal.</p>
             </div>
 
-            <div class="discipline-grid">
-                @foreach ($disciplines as $index => $discipline)
-                    <article class="discipline reveal">
-                        <div class="discipline-icon icon-{{ $index + 1 }}" aria-hidden="true"><span></span><span></span><span></span></div>
-                        <p>0{{ $index + 1 }}</p>
-                        <h3>{{ $discipline['title'] }}</h3>
-                        <ul>
-                            @foreach ($discipline['items'] as $item)
-                                <li>{{ $item }}</li>
-                            @endforeach
-                        </ul>
-                    </article>
-                @endforeach
-            </div>
+            @if ($teamMembers->isNotEmpty())
+                <div class="people-grid">
+                    @foreach ($teamMembers as $teamMember)
+                        <article class="person-card reveal">
+                            <div class="person-avatar">
+                                @if ($teamMember->avatar_url)
+                                    <img src="{{ $teamMember->avatar_url }}" alt="">
+                                @else
+                                    <span>{{ str($teamMember->name)->substr(0, 2)->upper() }}</span>
+                                @endif
+                            </div>
+                            <p>{{ $teamMember->role }}</p>
+                            <h3>{{ $teamMember->name }}</h3>
+                            @if ($teamMember->bio)<div class="person-bio">{{ $teamMember->bio }}</div>@endif
+                            @if ($teamMember->skills)
+                                <ul aria-label="Skills">
+                                    @foreach ($teamMember->skills as $skill)<li>{{ $skill }}</li>@endforeach
+                                </ul>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <div class="discipline-grid">
+                    @foreach ($disciplines as $index => $discipline)
+                        <article class="discipline reveal">
+                            <div class="discipline-icon icon-{{ $index + 1 }}" aria-hidden="true"><span></span><span></span><span></span></div>
+                            <p>0{{ $index + 1 }}</p>
+                            <h3>{{ $discipline['title'] }}</h3>
+                            <ul>
+                                @foreach ($discipline['items'] as $item)
+                                    <li>{{ $item }}</li>
+                                @endforeach
+                            </ul>
+                        </article>
+                    @endforeach
+                </div>
+            @endif
 
             <div class="team-note reveal">
                 <span>DevTZ</span>

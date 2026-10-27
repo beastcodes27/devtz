@@ -496,6 +496,17 @@ textarea:focus-visible {
 .discipline h3 { position: relative; margin: 0 0 24px; font-size: 40px; letter-spacing: -.05em; }
 .discipline ul { position: relative; margin: 0; padding: 0; list-style: none; }
 .discipline li { padding: 7px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.people-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 80px; }
+.person-card { min-height: 430px; padding: 24px; border: 1px solid var(--line); background: white; border-radius: var(--radius); transition: transform .25s ease, box-shadow .25s ease; }
+.person-card:hover { transform: translateY(-7px); box-shadow: 0 20px 50px rgba(12,20,36,.12); }
+.person-avatar { aspect-ratio: 4 / 3; display: grid; place-items: center; margin-bottom: 26px; background: var(--ink); border-radius: 16px; overflow: hidden; }
+.person-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.person-avatar span { color: var(--lime); font-size: 56px; font-weight: 950; letter-spacing: -.08em; }
+.person-card > p { margin: 0 0 6px; color: var(--violet); font-size: 10px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.person-card h3 { margin: 0; font-size: 30px; letter-spacing: -.045em; }
+.person-bio { margin-top: 14px; color: rgba(12,20,36,.62); font-size: 13px; line-height: 1.65; }
+.person-card ul { display: flex; flex-wrap: wrap; gap: 7px; margin: 20px 0 0; padding: 0; list-style: none; }
+.person-card li { padding: 6px 10px; background: var(--paper-2); border-radius: 999px; font-size: 9px; font-weight: 750; }
 .discipline-icon { position: absolute; width: 180px; height: 180px; top: 48px; right: -30px; }
 .discipline-icon span { position: absolute; display: block; border: 1px solid var(--ink); }
 .icon-1 span { width: 86px; height: 86px; border-radius: 50%; }
@@ -621,9 +632,10 @@ textarea:focus-visible {
     .team-header { display: block; }
     .team-header .kicker { margin-bottom: 30px; }
     .team-header > p:last-child { margin-top: 30px; }
-    .discipline-grid { grid-template-columns: 1fr; }
+    .discipline-grid, .people-grid { grid-template-columns: 1fr; }
     .discipline { min-height: 330px; }
     .discipline > p { margin-bottom: 65px; }
+    .person-card { min-height: 0; }
     .contact-form { margin-top: 55px; }
 }
 

@@ -2,12 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
+use App\Models\TeamMember;
 use Illuminate\Contracts\View\View;
 
 class PortfolioController extends Controller
 {
     public function __invoke(): View
     {
+        $projects = Project::featured()
+            ->limit(6)
+            ->get()
+            ->values()
+            ->map(fn (Project $project, int $index): array => [
+                'index' => str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                'name' => $project->title,
+                'type' => $project->category,
+                'summary' => $project->summary,
+                'tags' => $project->tags ?? [],
+                'theme' => $project->theme,
+            ])
+            ->all();
+
         return view('portfolio', [
             'services' => [
                 ['number' => '01', 'title' => 'Plan your idea', 'description' => 'We help you decide what to build, who it is for, and what matters most.'],
@@ -15,7 +31,7 @@ class PortfolioController extends Controller
                 ['number' => '03', 'title' => 'Build it properly', 'description' => 'We turn the approved design into a fast, reliable website or online system.'],
                 ['number' => '04', 'title' => 'Support your growth', 'description' => 'After launch, we help you improve, update, and grow your website over time.'],
             ],
-            'projects' => [
+            'projects' => $projects ?: [
                 [
                     'index' => '01',
                     'name' => 'Pamoja',
@@ -46,6 +62,7 @@ class PortfolioController extends Controller
                 ['title' => 'Create', 'items' => ['Clear pages', 'Simple journeys', 'A strong look']],
                 ['title' => 'Deliver', 'items' => ['A working website', 'A smooth launch', 'Ongoing help']],
             ],
+            'teamMembers' => TeamMember::active()->limit(6)->get(),
         ]);
     }
 }
