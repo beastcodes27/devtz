@@ -7,6 +7,6 @@ document.querySelectorAll('[data-screenshot-input]').forEach((input) => {
 
         selection.textContent = count
             ? `${count} ${count === 1 ? 'screenshot' : 'screenshots'} selected`
-            : 'Select one or several images from your device';
+            : 'Choose one or several images from your device';
     });
 });

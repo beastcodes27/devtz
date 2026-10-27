@@ -54,11 +54,17 @@
     @if ($editingProject?->images->isNotEmpty())
         <div class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             @foreach ($editingProject->images as $image)
-                <label class="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-                    <img class="aspect-[4/3] w-full object-cover" src="{{ $image->url() }}" alt="{{ $editingProject->title }} screenshot {{ $loop->iteration }}">
-                    <span class="flex items-center gap-2 border-t border-slate-200 bg-white px-3 py-3 text-xs font-semibold text-slate-600">
-                        <input class="size-4 rounded border-slate-300 text-red-600 focus:ring-red-500" type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}" @checked(in_array($image->id, old('remove_image_ids', [])))>
-                        Remove this image
+                <label class="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-brand/30 hover:shadow-lg has-checked:border-red-300 has-checked:bg-red-50 has-checked:opacity-70">
+                    <span class="relative block bg-slate-100 p-2">
+                        <img class="aspect-video w-full rounded-xl bg-white object-contain shadow-sm" src="{{ $image->url() }}" alt="{{ $editingProject->title }} screenshot {{ $loop->iteration }}">
+                        <span class="absolute left-4 top-4 rounded-full bg-ink/85 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur">Screenshot {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                    </span>
+                    <span class="flex items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">
+                        <span><strong class="block text-xs text-ink">Portfolio image</strong><small class="mt-0.5 block text-[10px] font-normal text-slate-400">Shown in this order</small></span>
+                        <span class="flex items-center gap-2 text-xs font-semibold text-red-600">
+                            <input class="size-4 rounded border-slate-300 text-red-600 focus:ring-red-500" type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}" @checked(in_array($image->id, old('remove_image_ids', [])))>
+                            Remove
+                        </span>
                     </span>
                 </label>
             @endforeach
@@ -66,10 +72,11 @@
         @error('remove_image_ids.*')<small class="mt-3 block text-red-600">{{ $message }}</small>@enderror
     @endif
 
-    <label class="mt-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center transition hover:border-brand hover:bg-brand/5">
-        <span class="grid size-12 place-items-center rounded-2xl bg-brand/10 text-2xl text-brand" aria-hidden="true">+</span>
-        <strong class="mt-4 text-sm">Choose project screenshots</strong>
-        <small class="mt-1 text-xs text-slate-400" data-screenshot-selection>Select one or several images from your device</small>
+    <label class="group mt-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-brand/5 px-5 py-10 text-center transition hover:border-brand hover:shadow-lg hover:shadow-brand/5">
+        <span class="grid size-12 place-items-center rounded-2xl bg-brand text-2xl text-white shadow-lg shadow-brand/20 transition group-hover:-translate-y-1" aria-hidden="true">+</span>
+        <strong class="mt-4 text-sm">Add more screenshots</strong>
+        <small class="mt-1 text-xs text-slate-400" data-screenshot-selection>Choose one or several images from your device</small>
+        <span class="mt-4 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">JPG · PNG · WebP · 5 MB max</span>
         <input class="sr-only" type="file" name="screenshots[]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple data-screenshot-input>
     </label>
     @error('screenshots')<small class="mt-3 block text-red-600">{{ $message }}</small>@enderror

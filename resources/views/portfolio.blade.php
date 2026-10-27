@@ -115,6 +115,11 @@
                         <div class="project-visual {{ $project['theme'] }} {{ count($project['images']) ? 'has-images' : '' }}">
                             @if (count($project['images']))
                                 <div class="project-gallery" data-project-gallery data-autoplay-interval="2000" aria-label="{{ $project['name'] }} project screenshots">
+                                    <div class="project-gallery-chrome" aria-hidden="true">
+                                        <span class="project-gallery-lights"><i></i><i></i><i></i></span>
+                                        <span class="project-gallery-address">devtz.com / selected work</span>
+                                        <span class="project-gallery-view-count">{{ count($project['images']) }} {{ str('view')->plural(count($project['images'])) }}</span>
+                                    </div>
                                     <div class="project-gallery-track" data-gallery-track>
                                         @foreach ($project['images'] as $image)
                                             <figure class="project-gallery-slide" data-gallery-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
