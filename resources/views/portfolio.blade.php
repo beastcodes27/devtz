@@ -8,8 +8,8 @@
     <meta name="theme-color" content="#0d0d0d">
     <title>DevTZ — Websites and apps made simple.</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}">
-    <script src="{{ asset('js/portfolio.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v={{ filemtime(public_path('css/portfolio.css')) }}">
+    <script src="{{ asset('js/portfolio.js') }}?v={{ filemtime(public_path('js/portfolio.js')) }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
