@@ -35,10 +35,14 @@ class PortfolioController extends Controller
 
         return view('portfolio', [
             'services' => [
-                ['number' => '01', 'title' => 'Plan your idea', 'description' => 'We help you decide what to build, who it is for, and what matters most.'],
-                ['number' => '02', 'title' => 'Design the experience', 'description' => 'We make every page simple, clear, and easy for your customers to use.'],
-                ['number' => '03', 'title' => 'Build it properly', 'description' => 'We turn the approved design into a fast, reliable website or online system.'],
-                ['number' => '04', 'title' => 'Support your growth', 'description' => 'After launch, we help you improve, update, and grow your website over time.'],
+                ['number' => '01', 'title' => 'Enterprise software solutions', 'description' => 'Custom software that helps your business manage operations and grow.'],
+                ['number' => '02', 'title' => 'Web design and development', 'description' => 'Clear, responsive websites and web applications built around your goals.'],
+                ['number' => '03', 'title' => 'Mobile app development', 'description' => 'Practical mobile apps that make your services easy to use on the go.'],
+                ['number' => '04', 'title' => 'Automation and RPA', 'description' => 'Automate repetitive tasks so your team can focus on more important work.'],
+                ['number' => '05', 'title' => 'System maintenance and support', 'description' => 'Ongoing updates, troubleshooting, and support to keep your systems running.'],
+                ['number' => '06', 'title' => 'Payment integration', 'description' => 'Connect your website or app to payment services for convenient transactions.'],
+                ['number' => '07', 'title' => 'Security and compliance', 'description' => 'Help protect your systems and support your security and compliance needs.'],
+                ['number' => '08', 'title' => 'Tech consulting', 'description' => 'Practical advice to help you choose the right technology for your business.'],
             ],
             'projects' => $projects ?: [
                 [
