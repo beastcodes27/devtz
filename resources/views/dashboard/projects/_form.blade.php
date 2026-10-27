@@ -56,7 +56,7 @@
             @foreach ($editingProject->images as $image)
                 <label class="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-brand/30 hover:shadow-lg has-checked:border-red-300 has-checked:bg-red-50 has-checked:opacity-70">
                     <span class="relative block bg-slate-100 p-2">
-                        <img class="aspect-video w-full rounded-xl bg-white object-contain shadow-sm" src="{{ $image->url() }}" alt="{{ $editingProject->title }} screenshot {{ $loop->iteration }}">
+                        <img class="aspect-video w-full rounded-xl bg-white object-contain shadow-sm" src="{{ $image->url() }}" alt="{{ $editingProject->title }} screenshot {{ $loop->iteration }}" loading="lazy" decoding="async">
                         <span class="absolute left-4 top-4 rounded-full bg-ink/85 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur">Screenshot {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                     </span>
                     <span class="flex items-center justify-between gap-3 border-t border-slate-100 px-4 py-3">

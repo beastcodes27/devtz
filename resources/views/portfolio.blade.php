@@ -123,7 +123,13 @@
                                     <div class="project-gallery-track" data-gallery-track>
                                         @foreach ($project['images'] as $image)
                                             <figure class="project-gallery-slide" data-gallery-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
-                                                <img src="{{ $image['url'] }}" alt="{{ $image['alt'] }}" loading="{{ $loop->first ? 'eager' : 'lazy' }}" decoding="async">
+                                                <img
+                                                    @if ($loop->first) src="{{ $image['url'] }}" @else data-src="{{ $image['url'] }}" @endif
+                                                    alt="{{ $image['alt'] }}"
+                                                    loading="lazy"
+                                                    fetchpriority="low"
+                                                    decoding="async"
+                                                >
                                             </figure>
                                         @endforeach
                                     </div>
@@ -220,7 +226,7 @@
                         <article class="person-card reveal">
                             <div class="person-avatar">
                                 @if ($teamMember->avatar_url)
-                                    <img src="{{ $teamMember->avatar_url }}" alt="">
+                                    <img src="{{ $teamMember->avatar_url }}" alt="" loading="lazy" decoding="async">
                                 @else
                                     <span>{{ str($teamMember->name)->substr(0, 2)->upper() }}</span>
                                 @endif

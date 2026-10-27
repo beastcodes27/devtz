@@ -75,9 +75,22 @@
         const interval = Number.parseInt(gallery.dataset.autoplayInterval || '2000', 10);
         let currentIndex = 0;
         let autoplayTimer;
+        let galleryIsVisible = !('IntersectionObserver' in window);
+
+        const loadSlide = (index) => {
+            const normalizedIndex = (index + slides.length) % slides.length;
+            const image = slides[normalizedIndex]?.querySelector('img[data-src]');
+
+            if (!image) return;
+
+            image.src = image.dataset.src;
+            image.removeAttribute('data-src');
+        };
 
         const showSlide = (requestedIndex) => {
             currentIndex = (requestedIndex + slides.length) % slides.length;
+            loadSlide(currentIndex);
+            if (galleryIsVisible && slides.length > 1) loadSlide(currentIndex + 1);
             track.style.transform = `translateX(-${currentIndex * 100}%)`;
 
             slides.forEach((slide, index) => {
@@ -93,7 +106,7 @@
         const stopAutoplay = () => window.clearInterval(autoplayTimer);
         const startAutoplay = () => {
             stopAutoplay();
-            if (reducedMotion || slides.length < 2 || document.hidden) return;
+            if (reducedMotion || slides.length < 2 || document.hidden || !galleryIsVisible) return;
 
             autoplayTimer = window.setInterval(() => showSlide(currentIndex + 1), interval);
         };
@@ -121,7 +134,24 @@
         });
 
         showSlide(0);
-        startAutoplay();
+
+        if ('IntersectionObserver' in window) {
+            const galleryObserver = new IntersectionObserver(([entry]) => {
+                galleryIsVisible = entry.isIntersecting;
+
+                if (galleryIsVisible) {
+                    loadSlide(currentIndex);
+                    if (slides.length > 1) loadSlide(currentIndex + 1);
+                    startAutoplay();
+                } else {
+                    stopAutoplay();
+                }
+            }, { rootMargin: '200px 0px', threshold: 0.05 });
+
+            galleryObserver.observe(gallery);
+        } else {
+            startAutoplay();
+        }
     });
 
     const form = document.querySelector('.contact-form');

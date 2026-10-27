@@ -14,7 +14,7 @@
             <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-start gap-4">
                     @if ($teamMember->avatar_url)
-                        <img class="size-16 rounded-2xl object-cover" src="{{ $teamMember->avatar_url }}" alt="">
+                        <img class="size-16 rounded-2xl object-cover" src="{{ $teamMember->avatar_url }}" alt="" loading="lazy" decoding="async">
                     @else
                         <span class="grid size-16 shrink-0 place-items-center rounded-2xl bg-ink text-base font-black text-white">{{ str($teamMember->name)->substr(0, 2)->upper() }}</span>
                     @endif
