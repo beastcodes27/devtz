@@ -414,7 +414,20 @@ textarea:focus-visible {
 .project-visual.violet { background: var(--violet); }
 .project-visual.lime { background: var(--lime); }
 .project-visual.orange { background: var(--orange); }
-.concept-label { position: absolute; top: 20px; left: 20px; padding: 8px 11px; background: var(--paper); border: 1px solid var(--ink); border-radius: 999px; font-size: 9px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.project-visual.has-images { background: var(--ink); }
+.concept-label { position: absolute; z-index: 4; top: 20px; left: 20px; padding: 8px 11px; background: var(--paper); border: 1px solid var(--ink); border-radius: 999px; font-size: 9px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+
+.project-gallery { position: absolute; inset: 0; background: var(--ink); }
+.project-gallery-track { height: 100%; display: flex; transition: transform .65s cubic-bezier(.22,.8,.3,1); will-change: transform; }
+.project-gallery-slide { width: 100%; height: 100%; flex: 0 0 100%; margin: 0; }
+.project-gallery-slide img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.project-gallery-controls { position: absolute; z-index: 4; right: 20px; bottom: 20px; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(12,20,36,.82); color: white; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; backdrop-filter: blur(12px); }
+.project-gallery-controls button { width: 38px; height: 38px; padding: 0; background: transparent; color: white; border: 0; border-radius: 50%; font-size: 17px; transition: color .2s ease, background .2s ease; }
+.project-gallery-controls button:hover { background: var(--lime); color: var(--ink); }
+.project-gallery-controls span { min-width: 50px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-align: center; }
+.project-gallery-dots { position: absolute; z-index: 4; bottom: 29px; left: 20px; display: flex; align-items: center; gap: 7px; }
+.project-gallery-dots button { width: 8px; height: 8px; padding: 0; background: rgba(255,255,255,.55); border: 0; border-radius: 999px; transition: width .25s ease, background .25s ease; }
+.project-gallery-dots button[aria-current="true"] { width: 24px; background: var(--lime); }
 
 .phone-mockup {
     position: absolute;
@@ -648,6 +661,8 @@ textarea:focus-visible {
     .about-values article:last-child { border-bottom: 0; }
     .about-values h3 { margin-top: 25px; }
     .project-visual { min-height: 380px; }
+    .project-gallery-controls { right: 12px; bottom: 12px; }
+    .project-gallery-dots { bottom: 21px; left: 12px; }
     .phone-mockup { width: 200px; height: 350px; top: 42px; padding: 18px 15px; }
     .product-orb { width: 110px; height: 110px; }
     .mock-button { margin-top: 22px; }
@@ -704,4 +719,5 @@ textarea:focus-visible {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     .reveal { opacity: 1; transform: none; }
+    .project-gallery-track { transition: none; }
 }

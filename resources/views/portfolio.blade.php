@@ -112,8 +112,31 @@
             <div class="project-list">
                 @foreach ($projects as $project)
                     <article class="project reveal">
-                        <div class="project-visual {{ $project['theme'] }}">
-                            @if ($project['theme'] === 'violet')
+                        <div class="project-visual {{ $project['theme'] }} {{ count($project['images']) ? 'has-images' : '' }}">
+                            @if (count($project['images']))
+                                <div class="project-gallery" data-project-gallery data-autoplay-interval="2000" aria-label="{{ $project['name'] }} project screenshots">
+                                    <div class="project-gallery-track" data-gallery-track>
+                                        @foreach ($project['images'] as $image)
+                                            <figure class="project-gallery-slide" data-gallery-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+                                                <img src="{{ $image['url'] }}" alt="{{ $image['alt'] }}" loading="{{ $loop->first ? 'eager' : 'lazy' }}" decoding="async">
+                                            </figure>
+                                        @endforeach
+                                    </div>
+
+                                    @if (count($project['images']) > 1)
+                                        <div class="project-gallery-controls">
+                                            <button type="button" data-gallery-previous aria-label="Show previous {{ $project['name'] }} screenshot">←</button>
+                                            <span data-gallery-count aria-live="polite">1 / {{ count($project['images']) }}</span>
+                                            <button type="button" data-gallery-next aria-label="Show next {{ $project['name'] }} screenshot">→</button>
+                                        </div>
+                                        <div class="project-gallery-dots" aria-label="Choose a {{ $project['name'] }} screenshot">
+                                            @foreach ($project['images'] as $image)
+                                                <button type="button" data-gallery-dot="{{ $loop->index }}" aria-label="Show screenshot {{ $loop->iteration }}" aria-current="{{ $loop->first ? 'true' : 'false' }}"></button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif ($project['theme'] === 'violet')
                                 <div class="phone-mockup">
                                     <div class="phone-top"></div>
                                     <div class="product-orb"></div>
@@ -141,7 +164,7 @@
                                 </div>
                                 <svg class="visual-loop" viewBox="0 0 200 120" aria-hidden="true"><path d="M5 90C45 15 143 11 186 67c24 31-33 55-65 31C84 70 68 36 24 52"/></svg>
                             @endif
-                            <span class="concept-label">Example project</span>
+                            <span class="concept-label">{{ count($project['images']) ? 'Project gallery' : 'Example project' }}</span>
                         </div>
                         <div class="project-copy">
                             <span class="project-index">{{ $project['index'] }}</span>

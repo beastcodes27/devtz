@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\TeamMember;
 use App\ProjectStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PortfolioContentTest extends TestCase
@@ -14,10 +15,16 @@ class PortfolioContentTest extends TestCase
 
     public function test_portfolio_displays_featured_projects_and_active_team_members(): void
     {
-        Project::factory()->create([
+        Storage::fake('public');
+        $publishedProject = Project::factory()->create([
             'title' => 'Published project',
             'status' => ProjectStatus::Completed,
             'is_featured' => true,
+        ]);
+        $publishedProject->images()->createMany([
+            ['path' => 'projects/published/one.jpg', 'display_order' => 0],
+            ['path' => 'projects/published/two.jpg', 'display_order' => 1],
+            ['path' => 'projects/published/three.jpg', 'display_order' => 2],
         ]);
         Project::factory()->create([
             'title' => 'Private project',
@@ -42,9 +49,12 @@ class PortfolioContentTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Published project')
+            ->assertSee('data-autoplay-interval="2000"', false)
+            ->assertSee('data-gallery-next', false)
             ->assertDontSee('Private project')
             ->assertDontSee('Draft project')
             ->assertSee('Visible teammate')
             ->assertDontSee('Hidden teammate');
+        $this->assertSame(3, substr_count($response->getContent(), 'data-gallery-slide'));
     }
 }

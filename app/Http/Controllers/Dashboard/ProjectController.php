@@ -10,9 +10,13 @@ use App\Models\TeamMember;
 use App\ProjectStatus;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 
 class ProjectController extends Controller
 {
@@ -22,7 +26,7 @@ class ProjectController extends Controller
     public function index(): View
     {
         $projects = Project::query()
-            ->withCount('teamMembers')
+            ->withCount(['teamMembers', 'images'])
             ->when(request()->filled('search'), function ($query): void {
                 $search = request()->string('search')->trim()->toString();
 
@@ -62,10 +66,23 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request): RedirectResponse
     {
-        DB::transaction(function () use ($request): void {
-            $project = Project::create($this->projectData($request));
-            $project->teamMembers()->sync(Arr::get($request->validated(), 'team_member_ids', []));
-        });
+        $storedPaths = [];
+
+        try {
+            DB::transaction(function () use ($request, &$storedPaths): void {
+                $project = Project::create($this->projectData($request));
+                $project->teamMembers()->sync(Arr::get($request->validated(), 'team_member_ids', []));
+                $this->storeScreenshots(
+                    $project,
+                    (array) $request->file('screenshots', []),
+                    $storedPaths,
+                );
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($storedPaths);
+
+            throw $exception;
+        }
 
         return to_route('dashboard.projects.index')
             ->with('success', 'Project created successfully.');
@@ -76,7 +93,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project): View
     {
-        $project->load('teamMembers:id');
+        $project->load(['teamMembers:id', 'images']);
 
         return view('dashboard.projects.edit', [
             'project' => $project,
@@ -90,10 +107,33 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
     {
-        DB::transaction(function () use ($request, $project): void {
-            $project->update($this->projectData($request, $project));
-            $project->teamMembers()->sync(Arr::get($request->validated(), 'team_member_ids', []));
-        });
+        $storedPaths = [];
+        $removedPaths = [];
+
+        try {
+            DB::transaction(function () use ($request, $project, &$storedPaths, &$removedPaths): void {
+                $project->update($this->projectData($request, $project));
+                $project->teamMembers()->sync(Arr::get($request->validated(), 'team_member_ids', []));
+
+                $imagesToRemove = $project->images()
+                    ->whereKey(Arr::get($request->validated(), 'remove_image_ids', []))
+                    ->get();
+                $removedPaths = $imagesToRemove->pluck('path')->all();
+                $imagesToRemove->each->delete();
+
+                $this->storeScreenshots(
+                    $project,
+                    (array) $request->file('screenshots', []),
+                    $storedPaths,
+                );
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($storedPaths);
+
+            throw $exception;
+        }
+
+        Storage::disk('public')->delete($removedPaths);
 
         return to_route('dashboard.projects.index')
             ->with('success', 'Project updated successfully.');
@@ -104,7 +144,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project): RedirectResponse
     {
+        $imagePaths = $project->images()->pluck('path')->all();
         $project->delete();
+        Storage::disk('public')->delete($imagePaths);
 
         return to_route('dashboard.projects.index')
             ->with('success', 'Project deleted.');
@@ -115,7 +157,11 @@ class ProjectController extends Controller
         StoreProjectRequest|UpdateProjectRequest $request,
         ?Project $project = null,
     ): array {
-        $data = $request->safe()->except(['team_member_ids']);
+        $data = $request->safe()->except([
+            'team_member_ids',
+            'screenshots',
+            'remove_image_ids',
+        ]);
         $data['is_featured'] = $request->boolean('is_featured');
         $data['tags'] = collect(explode(',', $data['tags'] ?? ''))
             ->map(fn (string $tag): string => trim($tag))
@@ -126,6 +172,30 @@ class ProjectController extends Controller
         $data['slug'] = $this->uniqueSlug($data['title'], $project);
 
         return $data;
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $screenshots
+     * @param  array<int, string>  $storedPaths
+     */
+    private function storeScreenshots(Project $project, array $screenshots, array &$storedPaths): void
+    {
+        $nextDisplayOrder = ($project->images()->max('display_order') ?? -1) + 1;
+
+        foreach ($screenshots as $screenshot) {
+            $path = $screenshot->store('projects/'.$project->getKey(), 'public');
+
+            if (! is_string($path)) {
+                throw new RuntimeException('The project screenshot could not be stored.');
+            }
+
+            $storedPaths[] = $path;
+            $project->images()->create([
+                'path' => $path,
+                'display_order' => $nextDisplayOrder,
+            ]);
+            $nextDisplayOrder++;
+        }
     }
 
     private function uniqueSlug(string $title, ?Project $project = null): string

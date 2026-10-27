@@ -5,7 +5,7 @@
 @section('subheading', 'Add the work, delivery details, assigned team, and public portfolio settings.')
 
 @section('content')
-    <form method="POST" action="{{ route('dashboard.projects.store') }}">
+    <form method="POST" action="{{ route('dashboard.projects.store') }}" enctype="multipart/form-data">
         @csrf
         @include('dashboard.projects._form', ['submitLabel' => 'Create project'])
     </form>

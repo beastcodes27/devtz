@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'title',
@@ -37,6 +38,14 @@ class Project extends Model
     public function teamMembers(): BelongsToMany
     {
         return $this->belongsToMany(TeamMember::class)->withTimestamps();
+    }
+
+    /** @return HasMany<ProjectImage, $this> */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProjectImage::class)
+            ->orderBy('display_order')
+            ->orderBy('id');
     }
 
     #[Scope]

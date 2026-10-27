@@ -65,6 +65,65 @@
         linkedSections.forEach((section) => sectionObserver.observe(section));
     }
 
+    document.querySelectorAll('[data-project-gallery]').forEach((gallery) => {
+        const track = gallery.querySelector('[data-gallery-track]');
+        const slides = Array.from(gallery.querySelectorAll('[data-gallery-slide]'));
+        const dots = Array.from(gallery.querySelectorAll('[data-gallery-dot]'));
+        const previousButton = gallery.querySelector('[data-gallery-previous]');
+        const nextButton = gallery.querySelector('[data-gallery-next]');
+        const count = gallery.querySelector('[data-gallery-count]');
+        const interval = Number.parseInt(gallery.dataset.autoplayInterval || '2000', 10);
+        let currentIndex = 0;
+        let autoplayTimer;
+
+        const showSlide = (requestedIndex) => {
+            currentIndex = (requestedIndex + slides.length) % slides.length;
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+            slides.forEach((slide, index) => {
+                slide.setAttribute('aria-hidden', String(index !== currentIndex));
+            });
+            dots.forEach((dot, index) => {
+                dot.setAttribute('aria-current', String(index === currentIndex));
+            });
+
+            if (count) count.textContent = `${currentIndex + 1} / ${slides.length}`;
+        };
+
+        const stopAutoplay = () => window.clearInterval(autoplayTimer);
+        const startAutoplay = () => {
+            stopAutoplay();
+            if (reducedMotion || slides.length < 2 || document.hidden) return;
+
+            autoplayTimer = window.setInterval(() => showSlide(currentIndex + 1), interval);
+        };
+        const selectSlide = (index) => {
+            showSlide(index);
+            startAutoplay();
+        };
+
+        previousButton?.addEventListener('click', () => selectSlide(currentIndex - 1));
+        nextButton?.addEventListener('click', () => selectSlide(currentIndex + 1));
+        dots.forEach((dot) => {
+            dot.addEventListener('click', () => selectSlide(Number.parseInt(dot.dataset.galleryDot, 10)));
+        });
+        gallery.addEventListener('mouseenter', stopAutoplay);
+        gallery.addEventListener('mouseleave', startAutoplay);
+        gallery.addEventListener('focusin', stopAutoplay);
+        gallery.addEventListener('focusout', () => {
+            window.setTimeout(() => {
+                if (!gallery.contains(document.activeElement)) startAutoplay();
+            });
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopAutoplay();
+            else startAutoplay();
+        });
+
+        showSlide(0);
+        startAutoplay();
+    });
+
     const form = document.querySelector('.contact-form');
     form?.addEventListener('submit', () => {
         const button = form.querySelector('.submit-button');

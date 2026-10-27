@@ -3,10 +3,13 @@
 namespace Tests\Feature\Dashboard;
 
 use App\Models\Project;
+use App\Models\ProjectImage;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\ProjectStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProjectControllerTest extends TestCase
@@ -15,8 +18,14 @@ class ProjectControllerTest extends TestCase
 
     public function test_authenticated_user_can_create_project_with_assigned_team(): void
     {
+        Storage::fake('public');
         $user = User::factory()->create();
         $teamMember = TeamMember::factory()->create();
+        $screenshots = [
+            $this->fakeImage('home-page.jpg'),
+            $this->fakeImage('dashboard.png'),
+            $this->fakeImage('mobile-view.webp'),
+        ];
 
         $response = $this->actingAs($user)->post(route('dashboard.projects.store'), [
             'title' => 'Mwangaza Operations Hub',
@@ -34,6 +43,7 @@ class ProjectControllerTest extends TestCase
             'is_featured' => '1',
             'display_order' => 2,
             'team_member_ids' => [$teamMember->id],
+            'screenshots' => $screenshots,
         ]);
 
         $response->assertRedirect(route('dashboard.projects.index'))
@@ -50,10 +60,13 @@ class ProjectControllerTest extends TestCase
             'project_id' => $project->id,
             'team_member_id' => $teamMember->id,
         ]);
+        $this->assertDatabaseCount('project_images', 3);
+        Storage::disk('public')->assertExists($project->images()->pluck('path')->all());
     }
 
     public function test_invalid_project_is_rejected_without_creating_record(): void
     {
+        Storage::fake('public');
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('dashboard.projects.store'), [
@@ -66,19 +79,27 @@ class ProjectControllerTest extends TestCase
             'started_on' => '2026-02-01',
             'theme' => 'blue',
             'display_order' => 0,
+            'screenshots' => [UploadedFile::fake()->create('project.pdf', 100, 'application/pdf')],
         ]);
 
-        $response->assertSessionHasErrors(['title', 'category', 'summary', 'status', 'progress', 'due_on', 'theme']);
+        $response->assertSessionHasErrors(['title', 'category', 'summary', 'status', 'progress', 'due_on', 'theme', 'screenshots.0']);
         $this->assertDatabaseCount('projects', 0);
+        Storage::disk('public')->assertEmpty();
     }
 
     public function test_authenticated_user_can_update_and_delete_project(): void
     {
+        Storage::fake('public');
         $user = User::factory()->create();
         $project = Project::factory()->create([
             'title' => 'Old title',
             'slug' => 'old-title',
         ]);
+        $existingImage = ProjectImage::factory()->for($project)->create([
+            'path' => 'projects/'.$project->id.'/old-screenshot.jpg',
+            'display_order' => 0,
+        ]);
+        Storage::disk('public')->put($existingImage->path, 'old image');
 
         $this->actingAs($user)->put(route('dashboard.projects.update', $project), [
             'title' => 'New title',
@@ -89,6 +110,8 @@ class ProjectControllerTest extends TestCase
             'tags' => '',
             'theme' => 'violet',
             'display_order' => 0,
+            'remove_image_ids' => [$existingImage->id],
+            'screenshots' => [$this->fakeImage('new-screenshot.jpg')],
         ])->assertRedirect(route('dashboard.projects.index'));
 
         $this->assertDatabaseHas('projects', [
@@ -97,12 +120,40 @@ class ProjectControllerTest extends TestCase
             'slug' => 'new-title',
             'status' => ProjectStatus::Completed->value,
         ]);
+        $this->assertModelMissing($existingImage);
+        Storage::disk('public')->assertMissing($existingImage->path);
+        $newImage = $project->images()->firstOrFail();
+        Storage::disk('public')->assertExists($newImage->path);
 
         $this->actingAs($user)
             ->delete(route('dashboard.projects.destroy', $project))
             ->assertRedirect(route('dashboard.projects.index'));
 
         $this->assertModelMissing($project);
+        Storage::disk('public')->assertMissing($newImage->path);
+    }
+
+    public function test_project_cannot_remove_another_projects_screenshot(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $project = Project::factory()->create();
+        $otherProjectImage = ProjectImage::factory()->create();
+        Storage::disk('public')->put($otherProjectImage->path, 'other project image');
+
+        $this->actingAs($user)->put(route('dashboard.projects.update', $project), [
+            'title' => $project->title,
+            'category' => $project->category,
+            'summary' => $project->summary,
+            'status' => $project->status->value,
+            'progress' => $project->progress,
+            'theme' => $project->theme,
+            'display_order' => $project->display_order,
+            'remove_image_ids' => [$otherProjectImage->id],
+        ])->assertRedirect(route('dashboard.projects.index'));
+
+        $this->assertModelExists($otherProjectImage);
+        Storage::disk('public')->assertExists($otherProjectImage->path);
     }
 
     public function test_project_list_escapes_user_supplied_content(): void
@@ -115,5 +166,15 @@ class ProjectControllerTest extends TestCase
         $response->assertOk()
             ->assertSee('&lt;script&gt;', false)
             ->assertDontSee('<script>alert("project")</script>', false);
+    }
+
+    private function fakeImage(string $name): UploadedFile
+    {
+        $png = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+            true,
+        );
+
+        return UploadedFile::fake()->createWithContent($name, (string) $png);
     }
 }

@@ -41,6 +41,8 @@ class StoreProjectRequest extends FormRequest
             'display_order' => ['required', 'integer', 'between:0,999'],
             'team_member_ids' => ['nullable', 'array'],
             'team_member_ids.*' => ['integer', 'distinct', 'exists:team_members,id'],
+            'screenshots' => ['nullable', 'array', 'max:12'],
+            'screenshots.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ];
     }
 }

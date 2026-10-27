@@ -1,0 +1,1 @@
+document.querySelectorAll(`[data-screenshot-input]`).forEach(e=>{e.addEventListener(`change`,()=>{let t=e.closest(`label`)?.querySelector(`[data-screenshot-selection]`),n=e.files?.length??0;t&&(t.textContent=n?`${n} ${n===1?`screenshot`:`screenshots`} selected`:`Select one or several images from your device`)})});

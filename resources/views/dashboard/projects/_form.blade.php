@@ -43,6 +43,40 @@
 </div>
 
 <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h2 class="text-lg font-black tracking-tight">Project screenshots</h2>
+            <p class="mt-1 text-sm text-slate-500">Add up to 12 JPG, PNG, or WebP images at once. Each image can be up to 5 MB.</p>
+        </div>
+        <span class="text-xs font-bold uppercase tracking-[0.14em] text-brand">Auto-slides every 2 seconds</span>
+    </div>
+
+    @if ($editingProject?->images->isNotEmpty())
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach ($editingProject->images as $image)
+                <label class="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                    <img class="aspect-[4/3] w-full object-cover" src="{{ $image->url() }}" alt="{{ $editingProject->title }} screenshot {{ $loop->iteration }}">
+                    <span class="flex items-center gap-2 border-t border-slate-200 bg-white px-3 py-3 text-xs font-semibold text-slate-600">
+                        <input class="size-4 rounded border-slate-300 text-red-600 focus:ring-red-500" type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}" @checked(in_array($image->id, old('remove_image_ids', [])))>
+                        Remove this image
+                    </span>
+                </label>
+            @endforeach
+        </div>
+        @error('remove_image_ids.*')<small class="mt-3 block text-red-600">{{ $message }}</small>@enderror
+    @endif
+
+    <label class="mt-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center transition hover:border-brand hover:bg-brand/5">
+        <span class="grid size-12 place-items-center rounded-2xl bg-brand/10 text-2xl text-brand" aria-hidden="true">+</span>
+        <strong class="mt-4 text-sm">Choose project screenshots</strong>
+        <small class="mt-1 text-xs text-slate-400" data-screenshot-selection>Select one or several images from your device</small>
+        <input class="sr-only" type="file" name="screenshots[]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple data-screenshot-input>
+    </label>
+    @error('screenshots')<small class="mt-3 block text-red-600">{{ $message }}</small>@enderror
+    @error('screenshots.*')<small class="mt-3 block text-red-600">{{ $message }}</small>@enderror
+</div>
+
+<div class="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
     <h2 class="text-lg font-black tracking-tight">Assigned team</h2>
     <p class="mt-1 text-sm text-slate-500">Choose everyone contributing to this project.</p>
     <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

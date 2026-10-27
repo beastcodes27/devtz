@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectImage;
 use App\Models\TeamMember;
 use Illuminate\Contracts\View\View;
 
@@ -11,6 +12,7 @@ class PortfolioController extends Controller
     public function __invoke(): View
     {
         $projects = Project::featured()
+            ->with('images')
             ->limit(6)
             ->get()
             ->values()
@@ -21,6 +23,13 @@ class PortfolioController extends Controller
                 'summary' => $project->summary,
                 'tags' => $project->tags ?? [],
                 'theme' => $project->theme,
+                'images' => $project->images
+                    ->values()
+                    ->map(fn (ProjectImage $image, int $imageIndex): array => [
+                        'url' => $image->url(),
+                        'alt' => $project->title.' project screenshot '.($imageIndex + 1),
+                    ])
+                    ->all(),
             ])
             ->all();
 
@@ -39,6 +48,7 @@ class PortfolioController extends Controller
                     'summary' => 'A simple online shop that helps customers find what they need and complete an order without confusion.',
                     'tags' => ['Easy ordering', 'Mobile friendly', 'Simple checkout'],
                     'theme' => 'violet',
+                    'images' => [],
                 ],
                 [
                     'index' => '02',
@@ -47,6 +57,7 @@ class PortfolioController extends Controller
                     'summary' => 'One clear place for a busy team to see progress, follow daily work, and make better decisions.',
                     'tags' => ['Clear reports', 'Live updates', 'Simple controls'],
                     'theme' => 'lime',
+                    'images' => [],
                 ],
                 [
                     'index' => '03',
@@ -55,6 +66,7 @@ class PortfolioController extends Controller
                     'summary' => 'A welcoming website where people can share useful information, events, and opportunities.',
                     'tags' => ['Easy to use', 'Community news', 'Works everywhere'],
                     'theme' => 'orange',
+                    'images' => [],
                 ],
             ],
             'disciplines' => [
