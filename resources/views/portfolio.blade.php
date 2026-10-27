@@ -183,6 +183,9 @@
                                 <p>{{ $project['type'] }}</p>
                                 <h3>{{ $project['name'] }}</h3>
                                 <p class="project-summary">{{ $project['summary'] }}</p>
+                                @if (! empty($project['url']))
+                                    <a class="project-visit" href="{{ $project['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="Visit {{ $project['name'] }} (opens in a new tab)">Visit project <span aria-hidden="true">↗</span></a>
+                                @endif
                                 <ul aria-label="Project benefits">
                                     @foreach ($project['tags'] as $tag)
                                         <li>{{ $tag }}</li>

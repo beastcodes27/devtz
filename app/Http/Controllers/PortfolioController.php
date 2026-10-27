@@ -21,6 +21,7 @@ class PortfolioController extends Controller
                 'name' => $project->title,
                 'type' => $project->category,
                 'summary' => $project->summary,
+                'url' => $project->project_url,
                 'tags' => $project->tags ?? [],
                 'theme' => $project->theme,
                 'images' => $project->images
