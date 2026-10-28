@@ -19,7 +19,6 @@ class ExampleTest extends TestCase
             ->assertSee('About us')
             ->assertSee('We build software that works well and lasts.')
             ->assertSee('Services')
-            ->assertSee('Our work')
             ->assertSee('Our team')
             ->assertSee('Contact');
     }

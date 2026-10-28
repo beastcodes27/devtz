@@ -27,7 +27,9 @@
 
         <nav class="primary-nav" id="primary-nav" aria-label="Primary navigation" data-nav>
             <a href="#about">About us</a>
-            <a href="#work">Our work</a>
+            @if ($projects !== [])
+                <a href="#work">Our work</a>
+            @endif
             <a href="#services">Services</a>
             <a href="#team">Team</a>
             <a class="nav-cta" href="#contact">Contact <span aria-hidden="true">↗</span></a>
@@ -46,8 +48,8 @@
                     </h1>
                     <div class="hero-bottom reveal">
                         <p>Tell us what your business needs. We plan it, design it, build it, and help you after it goes live.</p>
-                        <a class="round-link" href="#work" aria-label="See selected work">
-                            <span>See examples</span>
+                        <a class="round-link" href="{{ $projects !== [] ? '#work' : '#services' }}" aria-label="{{ $projects !== [] ? 'See selected work' : 'Explore our services' }}">
+                            <span>{{ $projects !== [] ? 'See our work' : 'Our services' }}</span>
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m0 0 6-6m-6 6-6-6"/></svg>
                         </a>
                     </div>
@@ -100,13 +102,14 @@
             </div>
         </section>
 
+        @if ($projects !== [])
         <section class="work section" id="work" aria-labelledby="work-title">
             <div class="section-heading reveal">
                 <div>
-                    <p class="kicker">What we can create</p>
-                    <h2 id="work-title">Ideas made<br><i>easy to use.</i></h2>
+                    <p class="kicker">Selected work</p>
+                    <h2 id="work-title">Built for real<br><i>business needs.</i></h2>
                 </div>
-                <p>These example projects show how we turn common business needs into clear and useful online experiences.</p>
+                <p>A selection of websites, applications, and systems designed to solve practical problems clearly.</p>
             </div>
 
             <div class="project-list">
@@ -175,7 +178,7 @@
                                 </div>
                                 <svg class="visual-loop" viewBox="0 0 200 120" aria-hidden="true"><path d="M5 90C45 15 143 11 186 67c24 31-33 55-65 31C84 70 68 36 24 52"/></svg>
                             @endif
-                            <span class="concept-label">{{ count($project['images']) ? 'Project gallery' : 'Example project' }}</span>
+                            <span class="concept-label">{{ count($project['images']) ? 'Project gallery' : 'Selected project' }}</span>
                         </div>
                         <div class="project-copy">
                             <span class="project-index">{{ $project['index'] }}</span>
@@ -197,6 +200,7 @@
                 @endforeach
             </div>
         </section>
+        @endif
 
         <section class="services section" id="services" aria-labelledby="services-title">
             <div class="services-intro reveal">

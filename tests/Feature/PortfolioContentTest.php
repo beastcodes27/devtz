@@ -13,6 +13,18 @@ class PortfolioContentTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_portfolio_does_not_display_demo_work_without_published_projects(): void
+    {
+        $response = $this->get(route('portfolio'));
+
+        $response->assertOk()
+            ->assertDontSee('id="work"', false)
+            ->assertDontSee('Pamoja')
+            ->assertDontSee('Mwangaza')
+            ->assertDontSee('Kijiji')
+            ->assertSee('href="#services"', false);
+    }
+
     public function test_portfolio_displays_featured_projects_and_active_team_members(): void
     {
         Storage::fake('public');
@@ -50,6 +62,8 @@ class PortfolioContentTest extends TestCase
         $response = $this->get(route('portfolio'));
 
         $response->assertOk()
+            ->assertSee('id="work"', false)
+            ->assertSee('Selected work')
             ->assertSee('Published project')
             ->assertSee('data-autoplay-interval="2000"', false)
             ->assertSee('data-gallery-next', false)
