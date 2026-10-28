@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\InquiryController as DashboardInquiryController;
+use App\Http\Controllers\Dashboard\InquiryReplyController;
 use App\Http\Controllers\Dashboard\ProjectController;
 use App\Http\Controllers\Dashboard\TeamMemberController;
 use App\Http\Controllers\InquiryController;
@@ -24,6 +26,12 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('index');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::get('inquiries', [DashboardInquiryController::class, 'index'])->name('inquiries.index');
+    Route::get('inquiries/{inquiry}', [DashboardInquiryController::class, 'show'])->whereUuid('inquiry')->name('inquiries.show');
+    Route::post('inquiries/{inquiry}/replies', InquiryReplyController::class)
+        ->middleware('throttle:20,1')
+        ->whereUuid('inquiry')
+        ->name('inquiries.replies.store');
     Route::resource('projects', ProjectController::class)->except('show');
     Route::resource('team-members', TeamMemberController::class)->except('show');
 });

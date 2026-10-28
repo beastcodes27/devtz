@@ -30,6 +30,10 @@
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7.5h16m-16 0 2-3h5l2 3m-9 0V19h16V7.5M8 12h8"/></svg>
                 Projects
             </a>
+            <a @class(['flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition', 'bg-white/10 text-white' => request()->routeIs('dashboard.inquiries.*'), 'text-white/55 hover:bg-white/5 hover:text-white' => ! request()->routeIs('dashboard.inquiries.*')]) href="{{ route('dashboard.inquiries.index') }}">
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6.5h16v11H4v-11Zm0 1 8 6 8-6"/></svg>
+                Client emails
+            </a>
             <a @class(['flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition', 'bg-white/10 text-white' => request()->routeIs('dashboard.team-members.*'), 'text-white/55 hover:bg-white/5 hover:text-white' => ! request()->routeIs('dashboard.team-members.*')]) href="{{ route('dashboard.team-members.index') }}">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20m13-7a3 3 0 1 0 0-6m3 13v-1.5a3.5 3.5 0 0 0-2-3.16M10 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
                 Team members
@@ -64,6 +68,7 @@
             <nav class="mt-4 flex gap-2 overflow-x-auto pb-1 text-sm font-semibold">
                 <a class="whitespace-nowrap rounded-full bg-slate-100 px-4 py-2" href="{{ route('dashboard.index') }}">Overview</a>
                 <a class="whitespace-nowrap rounded-full bg-slate-100 px-4 py-2" href="{{ route('dashboard.projects.index') }}">Projects</a>
+                <a class="whitespace-nowrap rounded-full bg-slate-100 px-4 py-2" href="{{ route('dashboard.inquiries.index') }}">Emails</a>
                 <a class="whitespace-nowrap rounded-full bg-slate-100 px-4 py-2" href="{{ route('dashboard.team-members.index') }}">Team</a>
             </nav>
         </header>

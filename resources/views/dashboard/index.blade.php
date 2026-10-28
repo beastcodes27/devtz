@@ -55,15 +55,15 @@
         <section class="overflow-hidden rounded-3xl bg-ink text-white shadow-sm">
             <div class="flex items-start justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-6">
                 <div><p class="text-xs font-bold uppercase tracking-[0.14em] text-lime">Project inquiries</p><h2 class="mt-2 text-2xl font-black tracking-tight">{{ $inquiryCount }} received</h2></div>
-                <span class="grid size-10 place-items-center rounded-xl bg-white/10">↗</span>
+                <a class="grid size-10 place-items-center rounded-xl bg-white/10 transition hover:bg-lime hover:text-ink" href="{{ route('dashboard.inquiries.index') }}" aria-label="Open client emails">↗</a>
             </div>
             <div class="divide-y divide-white/10">
                 @forelse ($recentInquiries as $inquiry)
-                    <article class="px-5 py-4 sm:px-6">
+                    <a class="block px-5 py-4 transition hover:bg-white/5 sm:px-6" href="{{ route('dashboard.inquiries.show', $inquiry['id']) }}">
                         <div class="flex items-start justify-between gap-3"><strong class="text-sm">{{ $inquiry['name'] ?? 'Unknown' }}</strong><small class="text-[10px] text-white/35">{{ isset($inquiry['submitted_at']) ? \Illuminate\Support\Carbon::parse($inquiry['submitted_at'])->diffForHumans() : '' }}</small></div>
                         <p class="mt-1 text-xs text-white/45">{{ $inquiry['email'] ?? '' }} · {{ str($inquiry['project_type'] ?? 'project')->replace('-', ' ')->title() }}</p>
                         <p class="mt-3 line-clamp-2 text-xs leading-5 text-white/65">{{ $inquiry['message'] ?? '' }}</p>
-                    </article>
+                    </a>
                 @empty
                     <div class="px-6 py-12 text-center text-sm text-white/45">New inquiries from the portfolio will appear here.</div>
                 @endforelse
